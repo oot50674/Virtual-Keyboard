@@ -2,13 +2,13 @@ const layouts = {
   en: [
     ['q','w','e','r','t','y','u','i','o','p'],
     ['a','s','d','f','g','h','j','k','l'],
-    ['z','x','c','v','b','n','m'],
+    ['shift','z','x','c','v','b','n','m'],
     ['space']
   ],
   ko: [
     ['ㅂ','ㅈ','ㄷ','ㄱ','ㅅ','ㅛ','ㅕ','ㅑ','ㅐ','ㅔ'],
     ['ㅁ','ㄴ','ㅇ','ㄹ','ㅎ','ㅗ','ㅓ','ㅏ','ㅣ'],
-    ['ㅋ','ㅌ','ㅊ','ㅍ','ㅠ','ㅜ','ㅡ'],
+    ['shift','ㅋ','ㅌ','ㅊ','ㅍ','ㅠ','ㅜ','ㅡ'],
     ['space']
   ]
 };
@@ -42,6 +42,9 @@ const DOUBLE_JONG = {
   'ㄱㅅ':'ㄳ','ㄴㅈ':'ㄵ','ㄴㅎ':'ㄶ','ㄹㄱ':'ㄺ','ㄹㅁ':'ㄻ',
   'ㄹㅂ':'ㄼ','ㄹㅅ':'ㄽ','ㄹㅌ':'ㄾ','ㄹㅍ':'ㄿ','ㄹㅎ':'ㅀ',
   'ㅂㅅ':'ㅄ'
+};
+const SHIFT_DOUBLE_CHO = {
+  'ㅂ':'ㅃ','ㅈ':'ㅉ','ㄷ':'ㄸ','ㄱ':'ㄲ','ㅅ':'ㅆ'
 };
 const SPLIT_JONG = {
   'ㄳ':['ㄱ','ㅅ'],'ㄵ':['ㄴ','ㅈ'],'ㄶ':['ㄴ','ㅎ'],
@@ -132,8 +135,15 @@ class VirtualKeyboard {
     this.container=container;
     this.lang=lang;
     this.hangul=new HangulIME();
+    this.isShift=false;
+    this.ignoreInput=false;
     this.output='';
     this.render();
+    this.input.addEventListener('input',()=>{
+      if(this.ignoreInput) return;
+      this.hangul.reset();
+      this.output=this.input.value;
+    });
   }
   render(){
     this.container.innerHTML='';
@@ -145,7 +155,8 @@ class VirtualKeyboard {
       row.forEach(key=>{
         const keyBtn=document.createElement('button');
         keyBtn.className='key';
-        keyBtn.textContent=key==='space'?'␣':key;
+        if(key==='shift') keyBtn.classList.add('shift');
+        keyBtn.textContent=key==='space'?'␣':key==='shift'?'Shift':key;
         keyBtn.onclick=()=>this.handleKey(key);
         rowDiv.appendChild(keyBtn);
       });
@@ -153,18 +164,41 @@ class VirtualKeyboard {
     });
   }
   handleKey(key){
+    if(key==='shift'){
+      this.isShift=!this.isShift;
+      this.container.querySelectorAll('.key.shift').forEach(btn=>{
+        btn.classList.toggle('active',this.isShift);
+      });
+      return;
+    }
     if(this.lang==='ko'){
+      if(this.isShift && key!=='space'){
+        key=SHIFT_DOUBLE_CHO[key]||key;
+        this.isShift=false;
+        this.container.querySelectorAll('.key.shift').forEach(btn=>btn.classList.remove('active'));
+      }
       if(key==='space'){
         this.output+=this.hangul.flush()+' ';
       }else{
         this.output+=this.hangul.input(key);
       }
+      this.ignoreInput=true;
       this.input.value=this.output+this.hangul.getCurrent();
+      this.ignoreInput=false;
     }else{
       if(key==='space'){
+        this.ignoreInput=true;
         this.input.value+=' ';
+        this.ignoreInput=false;
       }else{
-        this.input.value+=key;
+        const ch=this.isShift?key.toUpperCase():key;
+        this.ignoreInput=true;
+        this.input.value+=ch;
+        this.ignoreInput=false;
+        if(this.isShift){
+          this.isShift=false;
+          this.container.querySelectorAll('.key.shift').forEach(btn=>btn.classList.remove('active'));
+        }
       }
     }
     this.input.focus();
@@ -190,72 +224,3 @@ window.addEventListener('DOMContentLoaded',()=>{
     keyboard.switchLanguage(e.target.value);
   });
 });
-=======
-    en: [
-        ['q','w','e','r','t','y','u','i','o','p'],
-        ['a','s','d','f','g','h','j','k','l'],
-        ['z','x','c','v','b','n','m'],
-        ['space']
-    ],
-    ko: [
-        ['ㅂ','ㅈ','ㄷ','ㄱ','ㅅ','ㅛ','ㅕ','ㅑ','ㅐ','ㅔ'],
-        ['ㅁ','ㄴ','ㅇ','ㄹ','ㅎ','ㅗ','ㅓ','ㅏ','ㅣ'],
-        ['ㅋ','ㅌ','ㅊ','ㅍ','ㅠ','ㅜ','ㅡ'],
-        ['space']
-    ]
-};
-
-class VirtualKeyboard {
-    constructor(input, container, lang = 'en') {
-        this.input = input;
-        this.container = container;
-        this.lang = lang;
-        this.render();
-    }
-
-    render() {
-        this.container.innerHTML = '';
-        this.container.className = 'keyboard';
-        const layout = layouts[this.lang];
-        layout.forEach(row => {
-            const rowDiv = document.createElement('div');
-            rowDiv.className = 'row';
-            row.forEach(key => {
-                const keyBtn = document.createElement('button');
-                keyBtn.className = 'key';
-                keyBtn.textContent = key === 'space' ? '␣' : key;
-                keyBtn.onclick = () => this.handleKey(key);
-                rowDiv.appendChild(keyBtn);
-            });
-            this.container.appendChild(rowDiv);
-        });
-    }
-
-    handleKey(key) {
-        if (key === 'space') {
-            this.input.value += ' ';
-        } else {
-            this.input.value += key;
-        }
-        this.input.focus();
-    }
-
-    switchLanguage(lang) {
-        if (layouts[lang]) {
-            this.lang = lang;
-            this.render();
-        }
-    }
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-    const input = document.getElementById('input');
-    const container = document.getElementById('keyboard');
-    const select = document.getElementById('lang-select');
-    const keyboard = new VirtualKeyboard(input, container, select.value);
-
-    select.addEventListener('change', e => {
-        keyboard.switchLanguage(e.target.value);
-    });
-});
-
