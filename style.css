@@ -34,6 +34,9 @@ body {
 .key:hover {
     background: #e0e0e0;
 }
+.key.shift.active {
+    background: #d0d0d0;
+}
 .lang-switch {
     margin-top: 10px;
 }
