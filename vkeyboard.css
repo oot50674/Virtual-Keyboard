@@ -180,7 +180,6 @@
     background: #d0d0d0;
 }
 .key.shift {
-    background: #d0d0d0;
     flex: 3; /* 기존 1.8 → 3 으로 확대 */
     min-width: calc(96px * var(--keyboard-scale, 1)); /* 최소 너비도 확대 */
 }
