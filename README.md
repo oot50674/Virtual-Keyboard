@@ -1,5 +1,5 @@
 # Virtual Keyboard
-<img width="700" height="430" alt="image" src="https://github.com/user-attachments/assets/0fead87a-e63c-4187-acd2-05792de1ba51" />
+<img width="636" height="413" alt="image" src="https://github.com/user-attachments/assets/829edc1a-57f8-430e-b543-3a53cd167fd0" />
 
 웹 브라우저에서 사용할 수 있는 한글/영문 가상 키보드 라이브러리입니다.
 
