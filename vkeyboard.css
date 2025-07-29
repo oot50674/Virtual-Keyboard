@@ -180,8 +180,9 @@
     background: #d0d0d0;
 }
 .key.shift {
-    flex: 1.8;
-    min-width: calc(64px * var(--keyboard-scale, 1));
+    background: #d0d0d0;
+    flex: 3; /* 기존 1.8 → 3 으로 확대 */
+    min-width: calc(96px * var(--keyboard-scale, 1)); /* 최소 너비도 확대 */
 }
 .key.shift.locked {
     background: #a0a0ff;
@@ -200,8 +201,8 @@
 .key.enter {
     background: #b5dcc5;
     font-weight: bold;
-    flex: 1.5;
-    min-width: calc(56px * var(--keyboard-scale, 1));
+    flex: 2; /* 기존 1.5 → 2 로 확대 */
+    min-width: calc(72px * var(--keyboard-scale, 1)); /* 최소 너비도 확대 */
     color: #3a6b4a;
 }
 .key.enter:hover {
