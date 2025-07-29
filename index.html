@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Keyboard Demo</title>
+    <style>
+        /* 기본 페이지 레이아웃 스타일 */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+        }
+        
+        .container {
+            text-align: center;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .input-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        
+        #input {
+            width: 400px;
+            max-width: 95%;
+            padding: 10px 8px;
+            font-size: 1.2rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.3s ease;
+            resize: vertical;
+            min-height: 60px;
+            font-family: inherit;
+        }
+        
+        #input:focus {
+            border-color: #4CAF50;
+        }
+        
+        .keyboard-trigger {
+            background: none;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 6px 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+        }
+        
+        .keyboard-trigger:hover {
+            background: #f0f0f0;
+            border-color: #4CAF50;
+        }
+        
+        .keyboard-trigger img {
+            width: 17px;
+            height: 11px;
+            display: block;
+        }
+        
+        .controls {
+            display: none !important;
+        }
+        
+        .size-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .size-control label {
+            font-size: 0.9rem;
+            color: #333;
+            white-space: nowrap;
+        }
+        
+        .size-slider {
+            width: 120px;
+            height: 6px;
+            background: #ddd;
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+        
+        .size-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #4CAF50;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .size-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #4CAF50;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+        
+        #size-value {
+            font-size: 0.9rem;
+            color: #666;
+            min-width: 40px;
+        }
+        
+        .lang-switch {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+        }
+        
+        /* 반응형 디자인 */
+        @media (max-width: 900px) {
+            .controls {
+                gap: 15px;
+            }
+            .size-control {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .input-container {
+                gap: 6px;
+            }
+            .keyboard-trigger {
+                height: 36px;
+                padding: 5px 6px;
+            }
+            .keyboard-trigger img {
+                width: 15px;
+                height: 10px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .size-slider {
+                width: 150px;
+            }
+            #input {
+                width: 90%;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="vkeyboard.css">
+</head>
+<body>
+    <div class="container">
+        <div class="input-container">
+            <textarea id="input" placeholder="Type here..." rows="3"></textarea>
+            <button class="keyboard-trigger">
+                <img src="https://www.nfa.go.kr/nfa/common/images/common/keyboard.png" alt="키보드" />
+            </button>
+        </div>
+    </div>
+    <script src="vkeyboard.js"></script>
+    <script>
+        // 키보드 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            // 'input' 아이디를 가진 인풋창에 키보드 바인딩
+            // 형제 요소 중 keyboard-trigger 클래스가 있으면 자동으로 아이콘 모드로 동작
+            const keyboard = initVirtualKeyboard('input', {
+                lang: 'ko',           // 초기 언어 (en 또는 ko)
+                showControls: false,   // 상단 컨트롤 표시 여부
+                align: 'right',         // 키보드 정렬 방식 (center, left, right)
+            });
+        });
+    </script>
+</body>
+</html>
+
