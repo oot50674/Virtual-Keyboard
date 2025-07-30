@@ -2,12 +2,19 @@
  * 가상 키보드 라이브러리
  * @file vkeyboard.js
  * 작성일: 2025.07.28
- * 버전: 1.0.0
+ * 최근 업데이트: 2025.07.30
+ * 버전: 1.1.0
  * 
  * 설명: 한글/영문 입력을 지원하는 가상 키보드 라이브러리
  *       - 한글 조합 기능 지원
  *       - 반응형 디자인 적용
+ *       - 드래그 앤 드롭 기능 지원
+ *       - 터치 디바이스 지원
  *       - 다양한 설정 옵션 제공
+ * 
+ * 새로운 기능 (v1.1.0):
+ *   - 키보드 헤더 드래그하여 자유로운 위치 이동
+ *   - 마우스 및 터치 입력 모두 지원
  * 
  * 사용법:
  *   const keyboard = initVirtualKeyboard('inputId', {
@@ -349,9 +356,17 @@ VirtualKeyboard.prototype._initializeProperties = function(inputId, options) {
   this.keyboardScale = KEYBOARD_CONSTANTS.DEFAULT_SCALE;
   this.isVisible = false;
   
+  // 드래그 관련 속성
+  this.isDragging = false;
+  this.dragStartX = 0;
+  this.dragStartY = 0;
+  this.keyboardStartX = 0;
+  this.keyboardStartY = 0;
+  this.isDragMode = false; // 드래그 모드 여부 (자동 위치 조정 비활성화)
+  
   var self = this;
   window.addEventListener('resize', function() {
-    if (self.isVisible) {
+    if (self.isVisible && !self.isDragMode) {
       self.positionKeyboard();
     }
   });
@@ -403,6 +418,10 @@ VirtualKeyboard.prototype._createKeyboardHeader = function() {
     className: KEYBOARD_CONSTANTS.CLASSES.KEYBOARD_HEADER
   });
   
+  // 헤더를 드래그 가능하도록 설정
+  header.style.cursor = 'move';
+  header.setAttribute('title', '드래그하여 키보드 이동');
+  
   // header-left 생성
   var headerLeft = createElement('div', {
     className: KEYBOARD_CONSTANTS.CLASSES.KEYBOARD_HEADER_LEFT
@@ -433,6 +452,9 @@ VirtualKeyboard.prototype._createKeyboardHeader = function() {
   
   header.appendChild(headerLeft);
   header.appendChild(headerRight);
+  
+  // 드래그 이벤트 리스너 추가
+  this._setupDragEvents(header);
   
   return header;
 };
@@ -595,10 +617,13 @@ VirtualKeyboard.prototype.hideKeyboard = function() {
 };
 
 VirtualKeyboard.prototype.positionKeyboard = function() {
-  if (this.align === 'center') {
-    this._positionCenter();
-  } else {
-    this._positionAligned();
+  // 드래그 모드가 아닐 때만 자동 위치 조정
+  if (!this.isDragMode) {
+    if (this.align === 'center') {
+      this._positionCenter();
+    } else {
+      this._positionAligned();
+    }
   }
 };
 
@@ -634,6 +659,109 @@ VirtualKeyboard.prototype._positionAligned = function() {
   this.overlay.style.left = left + 'px';
   this.overlay.style.transform = 'translateX(0)';
   this.overlay.style.top = (inputRect.bottom + 2) + 'px';
+};
+
+// 드래그 이벤트 설정
+VirtualKeyboard.prototype._setupDragEvents = function(header) {
+  var self = this;
+  
+  // 마우스 이벤트
+  header.addEventListener('mousedown', function(e) {
+    self._startDrag(e, e.clientX, e.clientY);
+  });
+  
+  document.addEventListener('mousemove', function(e) {
+    if (self.isDragging) {
+      self._onDrag(e.clientX, e.clientY);
+    }
+  });
+  
+  document.addEventListener('mouseup', function() {
+    self._endDrag();
+  });
+  
+  // 터치 이벤트 (모바일 지원)
+  header.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    var touch = e.touches[0];
+    self._startDrag(e, touch.clientX, touch.clientY);
+  });
+  
+  document.addEventListener('touchmove', function(e) {
+    if (self.isDragging) {
+      e.preventDefault();
+      var touch = e.touches[0];
+      self._onDrag(touch.clientX, touch.clientY);
+    }
+  }, { passive: false });
+  
+  document.addEventListener('touchend', function() {
+    self._endDrag();
+  });
+};
+
+// 드래그 시작
+VirtualKeyboard.prototype._startDrag = function(e, clientX, clientY) {
+  // 버튼 클릭인 경우 드래그 방지
+  if (e.target.tagName === 'BUTTON') {
+    return;
+  }
+  
+  this.isDragging = true;
+  this.isDragMode = true;
+  
+  // 드래그 시작 위치 저장
+  this.dragStartX = clientX;
+  this.dragStartY = clientY;
+  
+  // 현재 키보드 위치 저장
+  var rect = this.overlay.getBoundingClientRect();
+  this.keyboardStartX = rect.left;
+  this.keyboardStartY = rect.top;
+  
+  // 키보드 스타일 변경 (드래그 중임을 표시)
+  this.overlay.style.transition = 'none';
+  this.overlay.style.userSelect = 'none';
+  document.body.style.userSelect = 'none';
+  
+  e.preventDefault();
+};
+
+// 드래그 중
+VirtualKeyboard.prototype._onDrag = function(clientX, clientY) {
+  if (!this.isDragging) return;
+  
+  // 드래그 거리 계산
+  var deltaX = clientX - this.dragStartX;
+  var deltaY = clientY - this.dragStartY;
+  
+  // 새로운 위치 계산
+  var newX = this.keyboardStartX + deltaX;
+  var newY = this.keyboardStartY + deltaY;
+  
+  // 뷰포트 경계 체크
+  var maxX = window.innerWidth - this.overlay.offsetWidth;
+  var maxY = window.innerHeight - this.overlay.offsetHeight;
+  
+  newX = Math.max(0, Math.min(newX, maxX));
+  newY = Math.max(0, Math.min(newY, maxY));
+  
+  // 키보드 위치 업데이트
+  this.overlay.style.left = newX + 'px';
+  this.overlay.style.top = newY + 'px';
+  this.overlay.style.transform = 'none';
+};
+
+// 드래그 종료
+VirtualKeyboard.prototype._endDrag = function() {
+  if (!this.isDragging) return;
+  
+  this.isDragging = false;
+  
+  // 스타일 복원
+  this.overlay.style.transition = '';
+  this.overlay.style.userSelect = '';
+  document.body.style.userSelect = '';
 };
 
 VirtualKeyboard.prototype.render = function() {
@@ -988,6 +1116,9 @@ VirtualKeyboard.prototype.resetInput = function() {
   // Shift 상태 (활성화 여부, 고정 여부) 초기화
   this.isShift = false;
   this.isShiftLocked = false;
+  // 드래그 모드 해제 및 키보드 위치 초기화
+  this.isDragMode = false;
+  this.positionKeyboard();
   // 변경된 Shift 상태를 반영하여 키보드 다시 렌더링
   this.render();
   // 입력 필드에 포커스 재설정

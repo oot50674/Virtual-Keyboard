@@ -11,6 +11,7 @@
 - 🇺🇸 **영문 입력**: QWERTY 레이아웃의 영문 키보드
 - 🎛️ **크기 조절**: 사용자가 키보드 크기를 자유롭게 조절 가능
 - 🌐 **언어 전환**: 한글/영문 간 쉬운 전환
+- 🖱️ **드래그 앤 드롭**: 키보드를 드래그하여 원하는 위치로 이동 가능
 - 🎨 **커스터마이징**: 다양한 설정 옵션 제공
 
 ## 🚀 빠른 시작
@@ -80,15 +81,19 @@ const keyboard = initVirtualKeyboard('myInput', {
 
 ```javascript
 // 키보드 표시/숨김
-keyboard.show();
-keyboard.hide();
+keyboard.showKeyboard();
+keyboard.hideKeyboard();
 
 // 언어 변경
-keyboard.setLanguage('ko'); // 한글로 변경
-keyboard.setLanguage('en'); // 영문으로 변경
+keyboard.switchLanguage('ko'); // 한글로 변경
+keyboard.switchLanguage('en'); // 영문으로 변경
 
 // 크기 조절
-keyboard.setScale(1.2); // 120% 크기로 조절
+keyboard.setKeyboardSize(1.2); // 120% 크기로 조절
+keyboard.adjustKeyboardSize(10); // 현재 크기에서 10% 증가
+
+// 입력 초기화
+keyboard.resetInput(); // 입력 내용 및 키보드 위치 초기화
 ```
 
 ## 📁 파일 구조
@@ -108,6 +113,12 @@ Virtual-Keyboard/
 - 자음, 모음 조합 처리
 - 받침 입력 지원
 - 한글 타이핑 규칙 준수
+
+### 드래그 & 이동 기능
+- 키보드 헤더를 드래그하여 자유로운 위치 이동
+- 마우스 및 터치 입력 모두 지원
+- 화면 경계 내에서 안전한 이동
+- 드래그 후 위치 고정 및 자동 위치 조정 비활성화
 
 ### 반응형 디자인
 - 모바일 환경 최적화
@@ -137,7 +148,9 @@ CSS 변수를 사용하여 키보드의 모양을 쉽게 커스터마이징할 �
 ## 🔧 개발 정보
 
 - **작성일**: 2025.07.28
-- **버전**: 1.0.0
+- **최근 업데이트**: 2025.07.30
+- **버전**: 1.1.0
+- **새로운 기능**: 드래그 앤 드롭 기능 추가
 - **라이선스**: MIT
 
 ---
