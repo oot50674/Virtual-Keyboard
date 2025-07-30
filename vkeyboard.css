@@ -141,8 +141,8 @@
     display: grid;
     grid-gap: calc(4px * var(--keyboard-scale, 1));
     justify-content: center;
-    width: calc(560px * var(--keyboard-scale, 1));
-    max-width: 98vw;
+    width: auto; /* 키 크기에 따라 자동으로 결정 */
+    max-width: none;
     margin: 0 4px;
     transition: all 0.3s ease;
 }
@@ -162,9 +162,10 @@
     box-shadow: 0 calc(2px * var(--keyboard-scale, 1)) calc(3px * var(--keyboard-scale, 1)) rgba(0,0,0,0.2);
     cursor: pointer;
     user-select: none;
-    flex: 1;
-    min-width: calc(36px * var(--keyboard-scale, 1));
-    max-width: calc(48px * var(--keyboard-scale, 1));
+    flex: 0 0 auto; /* 고정 크기 */
+    width: calc(48px * var(--keyboard-scale, 1));
+    min-width: unset;
+    max-width: unset;
     height: calc(36px * var(--keyboard-scale, 1));
     display: flex;
     align-items: center;
@@ -180,8 +181,8 @@
     background: #d0d0d0;
 }
 .key.shift {
-    flex: 3; /* 기존 1.8 → 3 으로 확대 */
-    min-width: calc(96px * var(--keyboard-scale, 1)); /* 최소 너비도 확대 */
+    flex: 0 0 auto;
+    width: calc(72px * var(--keyboard-scale, 1));
 }
 .key.shift.locked {
     background: #a0a0ff;
@@ -190,8 +191,8 @@
 .key.backspace {
     background: #e6d7c3;
     font-weight: bold;
-    flex: 1.5;
-    min-width: calc(56px * var(--keyboard-scale, 1));
+    flex: 0 0 auto;
+    width: calc(72px * var(--keyboard-scale, 1));
     color: #8b4513;
 }
 .key.backspace:hover {
@@ -200,8 +201,8 @@
 .key.enter {
     background: #b5dcc5;
     font-weight: bold;
-    flex: 2; /* 기존 1.5 → 2 로 확대 */
-    min-width: calc(72px * var(--keyboard-scale, 1)); /* 최소 너비도 확대 */
+    flex: 0 0 auto;
+    width: calc(72px * var(--keyboard-scale, 1));
     color: #3a6b4a;
 }
 .key.enter:hover {
@@ -222,14 +223,14 @@
     background: #ffe6cc;
 }
 .key[data-key="space"] {
-    flex: 6;
-    min-width: calc(240px * var(--keyboard-scale, 1));
-    max-width: calc(320px * var(--keyboard-scale, 1));
+    flex: 0 0 auto;
+    width: calc(240px * var(--keyboard-scale, 1));
+    min-width: unset;
+    max-width: unset;
 }
 .key[data-key="한영"] {
-    flex: 1.5;
-    min-width: calc(56px * var(--keyboard-scale, 1));
-    max-width: calc(72px * var(--keyboard-scale, 1));
+    flex: 0 0 auto;
+    width: calc(72px * var(--keyboard-scale, 1));
     background: #e6ffe6;
     color: #006600;
     font-weight: bold;
