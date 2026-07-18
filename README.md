@@ -1,5 +1,6 @@
 # Virtual Keyboard
-<img width="1388" height="739" alt="image" src="https://github.com/user-attachments/assets/1f8e87b0-55bd-4550-af50-5eb13998a32e" />
+<img width="1364" height="739" alt="image" src="https://github.com/user-attachments/assets/9bdd1ed8-5125-4b0c-82c4-08fbe28f51b9" />
+
 
 
 
