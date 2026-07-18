@@ -30,6 +30,7 @@
 const KEYBOARD_CONSTANTS = {
   // 시간 관련 상수
   DOUBLE_CLICK_THRESHOLD: 500,
+  REPEAT_KEY_THRESHOLD: 500,
   
   // 크기 관련 상수
   MIN_SCALE: 0.5,
@@ -121,16 +122,20 @@ const HANGUL_COMBINATIONS = {
     'ㄱㄱ':'ㄲ','ㄷㄷ':'ㄸ','ㅂㅂ':'ㅃ','ㅅㅅ':'ㅆ','ㅈㅈ':'ㅉ'
   },
   DOUBLE_JUNG: {
+    'ㅏㅏ':'ㅑ','ㅓㅓ':'ㅕ','ㅗㅗ':'ㅛ','ㅜㅜ':'ㅠ',
+    'ㅐㅐ':'ㅒ','ㅔㅔ':'ㅖ',
     'ㅗㅏ':'ㅘ','ㅗㅐ':'ㅙ','ㅗㅣ':'ㅚ','ㅜㅓ':'ㅝ',
     'ㅜㅔ':'ㅞ','ㅜㅣ':'ㅟ','ㅡㅣ':'ㅢ'
   },
   DOUBLE_JONG: {
+    'ㄱㄱ':'ㄲ','ㄷㄷ':'ㄸ','ㅂㅂ':'ㅃ','ㅅㅅ':'ㅆ','ㅈㅈ':'ㅉ',
     'ㄱㅅ':'ㄳ','ㄴㅈ':'ㄵ','ㄴㅎ':'ㄶ','ㄹㄱ':'ㄺ','ㄹㅁ':'ㄻ',
     'ㄹㅂ':'ㄼ','ㄹㅅ':'ㄽ','ㄹㅌ':'ㄾ','ㄹㅍ':'ㄿ','ㄹㅎ':'ㅀ',
     'ㅂㅅ':'ㅄ'
   },
   SHIFT_DOUBLE_CHO: {
-    'ㅂ':'ㅃ','ㅈ':'ㅉ','ㄷ':'ㄸ','ㄱ':'ㄲ','ㅅ':'ㅆ'
+    'ㅂ':'ㅃ','ㅈ':'ㅉ','ㄷ':'ㄸ','ㄱ':'ㄲ','ㅅ':'ㅆ',
+    'ㅐ':'ㅒ','ㅔ':'ㅖ'
   },
   SPLIT_JONG: {
     'ㄳ':['ㄱ','ㅅ'],'ㄵ':['ㄴ','ㅈ'],'ㄶ':['ㄴ','ㅎ'],
@@ -212,6 +217,8 @@ HangulIME.prototype.reset = function() {
   this.cho = '';
   this.jung = '';
   this.jong = '';
+  this.lastInput = '';
+  this.lastInputTime = 0;
 };
 
 HangulIME.prototype.getCurrent = function() {
@@ -226,21 +233,27 @@ HangulIME.prototype.flush = function() {
   return out;
 };
 
-HangulIME.prototype.input = function(ch) {
+HangulIME.prototype.input = function(ch, inputTime) {
   var out = ''; // 최종적으로 입력 필드에 반영될 문자열
+  var now = inputTime == null ? Date.now() : inputTime;
+  var isRapidRepeat = this.lastInput === ch &&
+    now - this.lastInputTime <= KEYBOARD_CONSTANTS.REPEAT_KEY_THRESHOLD;
   // 입력된 문자가 모음인지 자음인지 판별
   var isVowel = HANGUL_DATA.JUNG.indexOf(ch) !== -1;
   
   if (isVowel) {
-    out += this._handleVowelInput(ch); // 모음 입력 처리
+    out += this._handleVowelInput(ch, isRapidRepeat); // 모음 입력 처리
   } else {
-    out += this._handleConsonantInput(ch); // 자음 입력 처리
+    out += this._handleConsonantInput(ch, isRapidRepeat); // 자음 입력 처리
   }
+
+  this.lastInput = ch;
+  this.lastInputTime = now;
   
   return out;
 };
 
-HangulIME.prototype._handleVowelInput = function(ch) {
+HangulIME.prototype._handleVowelInput = function(ch, isRapidRepeat) {
   var out = '';
   
   if (!this.jung) {
@@ -250,7 +263,7 @@ HangulIME.prototype._handleVowelInput = function(ch) {
   } else if (!this.jong) {
     // 현재 중성이 있고 종성이 없는 경우 (초성 + 중성 상태)
     var comb = HANGUL_COMBINATIONS.DOUBLE_JUNG[this.jung + ch]; // 이중 모음 조합 시도
-    if (comb) {
+    if (comb && (this.jung !== ch || isRapidRepeat)) {
       this.jung = comb; // 이중 모음으로 조합 성공
     } else {
       // 이중 모음 조합 실패: 현재 조합된 글자를 완성하고, 새로운 모음으로 다음 글자 시작
@@ -279,7 +292,7 @@ HangulIME.prototype._handleVowelInput = function(ch) {
   return out;
 };
 
-HangulIME.prototype._handleConsonantInput = function(ch) {
+HangulIME.prototype._handleConsonantInput = function(ch, isRapidRepeat) {
   var out = '';
   
   if (!this.jung) {
@@ -288,7 +301,7 @@ HangulIME.prototype._handleConsonantInput = function(ch) {
       this.cho = ch; // 입력된 자음을 초성으로 설정
     } else {
       var comb = HANGUL_COMBINATIONS.DOUBLE_CHO[this.cho + ch]; // 이중 자음 조합 시도
-      if (comb) {
+      if (comb && isRapidRepeat) {
         this.cho = comb; // 이중 자음으로 조합 성공
       } else {
         // 이중 자음 조합 실패: 현재 초성으로 글자를 완성하고, 새로운 자음으로 다음 글자 시작
@@ -302,7 +315,7 @@ HangulIME.prototype._handleConsonantInput = function(ch) {
   } else {
     // 현재 종성까지 있는 경우 (초성 + 중성 + 종성 상태)
     var comb = HANGUL_COMBINATIONS.DOUBLE_JONG[this.jong + ch]; // 겹받침 조합 시도
-    if (comb) {
+    if (comb && (this.jong !== ch || isRapidRepeat)) {
       this.jong = comb; // 겹받침으로 조합 성공
     } else {
       // 겹받침 조합 실패: 현재 글자를 완성하고, 새로운 자음을 다음 글자의 초성으로 사용

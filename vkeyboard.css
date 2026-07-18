@@ -2,20 +2,33 @@
 
 /* 키보드 오버레이 스타일 */
 .keyboard-overlay {
+    --vk-panel: #e9edf2;
+    --vk-panel-edge: #cfd5dc;
+    --vk-header: #f7f8fa;
+    --vk-key: #ffffff;
+    --vk-key-hover: #f4f6f8;
+    --vk-key-active: #e8ecf1;
+    --vk-key-border: #d8dde3;
+    --vk-special: #d5dbe2;
+    --vk-special-hover: #c9d1da;
+    --vk-text: #20252b;
+    --vk-muted-text: #53606d;
+    --vk-accent: #416f9f;
+    --vk-accent-hover: #365f89;
     position: fixed;
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1000;
-    background: rgba(255, 255, 255, 0.98);
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    background: rgba(233, 237, 242, 0.98);
+    border: 1px solid var(--vk-panel-edge);
+    border-radius: 14px;
+    box-shadow: 0 18px 44px rgba(22, 30, 40, 0.18), 0 3px 10px rgba(22, 30, 40, 0.08);
     padding: 10px 6px 12px 6px;
     margin-top: 2px;
     opacity: 0;
     visibility: hidden;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(14px);
     max-width: 98vw;
     overflow: hidden;
 }
@@ -35,7 +48,7 @@
     height: 0;
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
-    border-bottom: 8px solid rgba(255, 255, 255, 0.98);
+    border-bottom: 8px solid var(--vk-panel-edge);
 }
 
 /* 키보드 헤더 스타일 */
@@ -44,8 +57,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 4px 8px 4px 8px;
-    border-bottom: 1px solid #e0e0e0;
-    background: rgba(248, 248, 248, 0.95);
+    border-bottom: 1px solid var(--vk-panel-edge);
+    background: rgba(247, 248, 250, 0.96);
     border-radius: 10px 10px 0 0;
     margin: -10px -6px 8px -6px;
 }
@@ -65,20 +78,20 @@
 }
 
 .keyboard-reset-btn {
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
+    background: #ffffff;
+    border: 1px solid var(--vk-key-border);
+    border-radius: 6px;
     padding: 4px 12px;
     font-size: 0.85rem;
-    color: #495057;
+    color: var(--vk-muted-text);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .keyboard-reset-btn:hover {
-    background: #e9ecef;
-    border-color: #adb5bd;
-    color: #212529;
+    background: var(--vk-key-hover);
+    border-color: #c5ccd4;
+    color: var(--vk-text);
 }
 
 
@@ -96,11 +109,11 @@
 .size-btn-mini {
     width: 22px;
     height: 22px;
-    background: #f3f3f3;
-    border: 1px solid #bbb;
-    border-radius: 5px;
+    background: #ffffff;
+    border: 1px solid var(--vk-key-border);
+    border-radius: 6px;
     font-size: 1.2rem;
-    color: #333;
+    color: var(--vk-muted-text);
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
     display: flex;
@@ -109,12 +122,12 @@
     padding: 0;
 }
 .size-btn-mini:hover {
-    background: #e0e0e0;
-    color: #219150;
+    background: var(--vk-key-hover);
+    color: var(--vk-accent);
 }
 #size-value-mini {
     font-size: 0.9rem;
-    color: #666;
+    color: var(--vk-muted-text);
     min-width: 38px;
     text-align: center;
     display: inline-block;
@@ -124,7 +137,7 @@
     background: none;
     border: none;
     font-size: 1.5rem;
-    color: #666;
+    color: var(--vk-muted-text);
     cursor: pointer;
     padding: 5px 8px;
     border-radius: 4px;
@@ -133,8 +146,8 @@
 }
 
 .keyboard-close-btn:hover {
-    background: rgba(255, 0, 0, 0.1);
-    color: #ff4444;
+    background: #e5e9ee;
+    color: var(--vk-text);
 }
 
 .keyboard {
@@ -154,12 +167,12 @@
     width: 100%;
 }
 .key {
-    background: #fff;
-    border: none;
+    background: var(--vk-key);
+    border: 1px solid var(--vk-key-border);
     padding: calc(8px * var(--keyboard-scale, 1)) calc(6px * var(--keyboard-scale, 1));
     font-size: calc(var(--keyboard-font-size, 1.0rem) * var(--keyboard-scale, 1));
-    border-radius: calc(3px * var(--keyboard-scale, 1));
-    box-shadow: 0 calc(2px * var(--keyboard-scale, 1)) calc(3px * var(--keyboard-scale, 1)) rgba(0,0,0,0.2);
+    border-radius: calc(6px * var(--keyboard-scale, 1));
+    box-shadow: 0 calc(2px * var(--keyboard-scale, 1)) 0 #bec5cd, 0 calc(3px * var(--keyboard-scale, 1)) calc(6px * var(--keyboard-scale, 1)) rgba(28, 37, 48, 0.08);
     cursor: pointer;
     user-select: none;
     flex: 0 0 auto; /* 고정 크기 */
@@ -171,56 +184,67 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    transition: all 0.3s ease;
-    font-weight: 500;
+    transition: background-color 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease, transform 0.08s ease;
+    font-weight: 600;
+    color: var(--vk-text);
 }
 .key:hover {
-    background: #e0e0e0;
+    background: var(--vk-key-hover);
+    border-color: #c6cdd5;
+}
+.key:active {
+    background: var(--vk-key-active);
+    box-shadow: 0 1px 0 #b9c1ca;
+    transform: translateY(1px);
 }
 .key.shift.active {
-    background: #d0d0d0;
+    background: #c7d4e2;
+    color: #294f75;
 }
 .key.shift {
     flex: 0 0 auto;
     width: calc(72px * var(--keyboard-scale, 1));
 }
 .key.shift.locked {
-    background: #a0a0ff;
-    border: calc(2px * var(--keyboard-scale, 1)) solid #6060ff;
+    background: #bdcee0;
+    border: 1px solid #7193b5;
+    box-shadow: inset 0 0 0 1px rgba(65, 111, 159, 0.18), 0 2px 0 #aab8c7;
 }
 .key.backspace {
-    background: #e6d7c3;
+    background: var(--vk-special);
     font-weight: bold;
     flex: 0 0 auto;
     width: calc(72px * var(--keyboard-scale, 1));
-    color: #8b4513;
+    color: var(--vk-text);
 }
 .key.backspace:hover {
-    background: #d4c5a9;
+    background: var(--vk-special-hover);
 }
 .key.enter {
-    background: #b5dcc5;
+    background: var(--vk-accent);
     font-weight: bold;
     flex: 0 0 auto;
     width: calc(72px * var(--keyboard-scale, 1));
-    color: #3a6b4a;
+    color: #ffffff;
+    border-color: #365f89;
+    box-shadow: 0 2px 0 #2d5277, 0 3px 7px rgba(45, 82, 119, 0.18);
 }
 .key.enter:hover {
-    background: #a8d5ba;
+    background: var(--vk-accent-hover);
 }
 .key.number {
-    background: #e6f3ff;
-    color: #0066cc;
+    background: #f8fafc;
+    color: #334155;
 }
 .key.number:hover {
-    background: #cce6ff;
+    background: #eef2f6;
 }
 .key.punctuation {
-    background: #fff3e6;
-    color: #cc6600;
+    background: #f3f5f7;
+    color: #465361;
 }
 .key.punctuation:hover {
-    background: #ffe6cc;
+    background: #e8ecf0;
 }
 .key[data-key="space"] {
     flex: 0 0 auto;
@@ -231,12 +255,12 @@
 .key[data-key="한영"] {
     flex: 0 0 auto;
     width: calc(72px * var(--keyboard-scale, 1));
-    background: #e6ffe6;
-    color: #006600;
+    background: var(--vk-special);
+    color: #315d88;
     font-weight: bold;
 }
 .key[data-key="한영"]:hover {
-    background: #ccffcc;
+    background: var(--vk-special-hover);
 }
 
 /* 키보드 전용 반응형 디자인 */
