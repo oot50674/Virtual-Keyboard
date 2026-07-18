@@ -31,6 +31,8 @@ const KEYBOARD_CONSTANTS = {
   // 시간 관련 상수
   DOUBLE_CLICK_THRESHOLD: 500,
   REPEAT_KEY_THRESHOLD: 500,
+  HOLD_REPEAT_DELAY: 400,
+  HOLD_REPEAT_INTERVAL: 75,
   
   // 크기 관련 상수
   MIN_SCALE: 0.5,
@@ -821,14 +823,77 @@ VirtualKeyboard.prototype._createKeyButton = function(key) {
   var displayText = this._getKeyDisplayText(key);
   keyBtn.textContent = displayText;
   
-  // 클릭 이벤트 설정
+  // 백스페이스와 Enter는 길게 누르면 연속 입력되도록 설정
   var self = this;
+  var repeatState = null;
+  if (key === 'backspace' || key === 'enter') {
+    repeatState = this._setupRepeatableKey(keyBtn, key);
+  }
+
+  // 클릭 이벤트 설정
   keyBtn.onclick = function(e) {
     e.stopPropagation();
+    // 길게 누른 뒤 발생하는 click 이벤트의 중복 입력 방지
+    if (repeatState && repeatState.didRepeat) {
+      repeatState.didRepeat = false;
+      return;
+    }
     self.handleKey(key);
   };
   
   return keyBtn;
+};
+
+VirtualKeyboard.prototype._setupRepeatableKey = function(keyBtn, key) {
+  var self = this;
+  var state = {
+    delayTimer: null,
+    intervalTimer: null,
+    didRepeat: false
+  };
+
+  function clearTimers() {
+    if (state.delayTimer !== null) {
+      clearTimeout(state.delayTimer);
+      state.delayTimer = null;
+    }
+    if (state.intervalTimer !== null) {
+      clearInterval(state.intervalTimer);
+      state.intervalTimer = null;
+    }
+  }
+
+  keyBtn.addEventListener('pointerdown', function(e) {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+
+    clearTimers();
+    state.didRepeat = false;
+
+    if (keyBtn.setPointerCapture && e.pointerId != null) {
+      try {
+        keyBtn.setPointerCapture(e.pointerId);
+      } catch (ignore) {
+        // 포인터 캡처를 지원하지 않는 환경에서도 반복 입력은 계속 동작한다.
+      }
+    }
+
+    state.delayTimer = setTimeout(function() {
+      state.didRepeat = true;
+      self.handleKey(key);
+      state.intervalTimer = setInterval(function() {
+        self.handleKey(key);
+      }, KEYBOARD_CONSTANTS.HOLD_REPEAT_INTERVAL);
+    }, KEYBOARD_CONSTANTS.HOLD_REPEAT_DELAY);
+  });
+
+  keyBtn.addEventListener('pointerup', clearTimers);
+  keyBtn.addEventListener('pointercancel', clearTimers);
+  keyBtn.addEventListener('lostpointercapture', clearTimers);
+  keyBtn.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  });
+
+  return state;
 };
 
 VirtualKeyboard.prototype._addKeyClasses = function(keyBtn, key) {

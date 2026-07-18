@@ -216,6 +216,7 @@
     flex: 0 0 auto;
     width: calc(72px * var(--keyboard-scale, 1));
     color: var(--vk-text);
+    touch-action: none;
 }
 .key.backspace:hover {
     background: var(--vk-special-hover);
@@ -228,6 +229,7 @@
     color: #ffffff;
     border-color: #365f89;
     box-shadow: 0 2px 0 #2d5277, 0 3px 7px rgba(45, 82, 119, 0.18);
+    touch-action: none;
 }
 .key.enter:hover {
     background: var(--vk-accent-hover);
